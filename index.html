@@ -1,0 +1,825 @@
+
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#f4f6fb">
+<title>Code-Einlöseportal</title>
+
+<style>
+:root {
+  --bg: #f4f6fb;
+  --card: #ffffff;
+  --text: #172033;
+  --muted: #718096;
+  --primary: #5146e5;
+  --primary-dark: #4035c7;
+  --border: #e5e9f2;
+  --success: #168653;
+  --danger: #d83b50;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  padding: 24px 16px;
+  padding-top: max(24px, env(safe-area-inset-top));
+  padding-bottom: max(24px, env(safe-area-inset-bottom));
+  background: var(--bg);
+  color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI",
+               Roboto, Arial, sans-serif;
+}
+
+button, input { font: inherit; }
+
+.container {
+  width: 100%;
+  max-width: 760px;
+  margin: 0 auto;
+}
+
+header {
+  text-align: center;
+  padding: 30px 10px 24px;
+}
+
+.logo {
+  width: 58px;
+  height: 58px;
+  display: grid;
+  place-items: center;
+  margin: 0 auto 16px;
+  background: #e9e7ff;
+  border-radius: 18px;
+  font-size: 27px;
+}
+
+h1 {
+  margin: 0;
+  font-size: clamp(25px, 6vw, 34px);
+  letter-spacing: -1px;
+}
+
+.subtitle {
+  color: var(--muted);
+  margin-top: 9px;
+  font-size: 15px;
+}
+
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: clamp(20px, 5vw, 32px);
+  box-shadow: 0 8px 30px rgba(30, 40, 70, .045);
+  margin-bottom: 18px;
+}
+
+.card h2 {
+  margin: 0 0 8px;
+  font-size: 21px;
+}
+
+.description {
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.5;
+  margin-bottom: 25px;
+}
+
+label {
+  display: block;
+  font-size: 14px;
+  font-weight: 650;
+  margin-bottom: 8px;
+}
+
+input {
+  width: 100%;
+  min-height: 54px;
+  padding: 14px 15px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: #fbfcff;
+  color: var(--text);
+  outline: none;
+  margin-bottom: 20px;
+  font-size: 16px;
+}
+
+input:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(81,70,229,.10);
+}
+
+button {
+  border: 0;
+  cursor: pointer;
+  border-radius: 12px;
+  min-height: 52px;
+  padding: 13px 20px;
+  font-weight: 650;
+  transition: .2s;
+  touch-action: manipulation;
+}
+
+button:active { transform: scale(.98); }
+
+.primary {
+  width: 100%;
+  color: white;
+  background: var(--primary);
+}
+
+.primary:hover { background: var(--primary-dark); }
+
+.secondary {
+  color: var(--text);
+  background: #eef0f6;
+}
+
+.admin-link {
+  display: block;
+  margin: 25px auto 0;
+  padding: 10px;
+  background: transparent;
+  color: #8790a3;
+  font-size: 13px;
+  min-height: auto;
+}
+
+.admin-link:hover { color: var(--primary); }
+
+.message {
+  display: none;
+  border-radius: 12px;
+  padding: 14px;
+  margin-top: 16px;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.message.error {
+  display: block;
+  background: #fff0f1;
+  color: var(--danger);
+}
+
+.message.success {
+  display: block;
+  background: #eaf8f0;
+  color: var(--success);
+}
+
+.result {
+  display: none;
+  text-align: center;
+  margin-top: 25px;
+  padding: 24px 15px;
+  background: #f2f1ff;
+  border: 1px solid #dedaff;
+  border-radius: 16px;
+}
+
+.result small {
+  display: block;
+  color: var(--muted);
+  margin-bottom: 12px;
+}
+
+.result-code {
+  font-size: clamp(24px, 7vw, 34px);
+  font-weight: 800;
+  letter-spacing: 2px;
+  color: var(--primary);
+  overflow-wrap: anywhere;
+  margin-bottom: 18px;
+}
+
+.copy-button {
+  background: white;
+  color: var(--primary);
+  border: 1px solid #dedaff;
+  min-height: 44px;
+}
+
+.hidden { display: none !important; }
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  margin-bottom: 22px;
+}
+
+.stat {
+  background: #f7f8fc;
+  border: 1px solid var(--border);
+  border-radius: 13px;
+  padding: 17px;
+}
+
+.stat strong {
+  display: block;
+  font-size: 27px;
+  margin-bottom: 4px;
+}
+
+.stat span {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.table-wrap {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}
+
+table {
+  width: 100%;
+  min-width: 700px;
+  border-collapse: collapse;
+  font-size: 13px;
+  text-align: left;
+}
+
+th, td {
+  padding: 14px 12px;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+
+th {
+  background: #f7f8fc;
+  color: var(--muted);
+  font-weight: 650;
+}
+
+tr:last-child td { border-bottom: 0; }
+
+.code-cell {
+  font-family: monospace;
+  font-weight: 700;
+  color: var(--primary);
+}
+
+.admin-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 20px;
+}
+
+.admin-actions button { flex: 1; }
+
+footer {
+  text-align: center;
+  color: #a0a8b8;
+  font-size: 12px;
+  padding: 15px;
+}
+
+@media (max-width: 480px) {
+  body { padding-left: 12px; padding-right: 12px; }
+  .card { border-radius: 16px; }
+}
+</style>
+</head>
+
+<body>
+<div class="container">
+
+<header>
+  <div class="logo">🔐</div>
+  <h1>Code-Einlöseportal</h1>
+  <div class="subtitle">Dein Zugang zum nächsten Rätsel</div>
+</header>
+
+<!-- NUTZERANSICHT -->
+<section id="userView" class="card">
+  <h2>Code einlösen</h2>
+  <div class="description">
+    Gib deinen Namen und deinen persönlichen Start-Code ein,
+    um deinen nächsten Rätsel-Code freizuschalten.
+  </div>
+
+  <form id="redeemForm">
+    <label for="userName">Name oder Kürzel</label>
+    <input
+      id="userName"
+      type="text"
+      placeholder="Dein Name"
+      maxlength="40"
+      autocomplete="name"
+      required
+    >
+
+    <label for="startCode">Dein Start-Code</label>
+    <input
+      id="startCode"
+      type="text"
+      placeholder="z. B. 7B4X9N2Z"
+      maxlength="40"
+      autocapitalize="characters"
+      autocomplete="off"
+      spellcheck="false"
+      required
+    >
+
+    <button type="submit" class="primary">
+      Code einlösen →
+    </button>
+  </form>
+
+  <div id="message" class="message" role="status" aria-live="polite"></div>
+
+  <div id="result" class="result">
+    <small>🎉 Dein neuer Rätsel-Code lautet:</small>
+    <div id="resultCode" class="result-code"></div>
+    <button type="button" class="copy-button" id="copyButton">
+      Code kopieren
+    </button>
+    <p style="font-size:13px;color:#718096;margin-bottom:0">
+      Bewahre diesen Code gut auf!
+    </p>
+  </div>
+
+  <button class="admin-link" id="showAdmin">
+    Admin-Übersicht
+  </button>
+</section>
+
+<!-- ADMIN LOGIN -->
+<section id="loginView" class="card hidden">
+  <h2>Admin-Zugang</h2>
+  <div class="description">
+    Bitte gib das Administrator-Passwort ein.
+  </div>
+
+  <form id="loginForm">
+    <label for="adminPassword">Passwort</label>
+    <input
+      id="adminPassword"
+      type="password"
+      placeholder="Admin-Passwort"
+      autocomplete="current-password"
+      required
+    >
+    <button class="primary" type="submit">Anmelden</button>
+  </form>
+
+  <div id="loginMessage" class="message" role="alert"></div>
+  <button class="admin-link" id="backFromLogin">← Zurück</button>
+</section>
+
+<!-- ADMIN DASHBOARD -->
+<section id="adminView" class="card hidden">
+  <h2>Admin-Übersicht</h2>
+  <div class="description">
+    Hier findest du alle bisher eingelösten Codes.
+  </div>
+
+  <div class="stats">
+    <div class="stat">
+      <strong id="totalRedemptions">0</strong>
+      <span>Einlösungen gesamt</span>
+    </div>
+    <div class="stat">
+      <strong id="remainingCodes">0</strong>
+      <span>Verfügbare Start-Codes</span>
+    </div>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Name / Kürzel</th>
+          <th>Start-Code</th>
+          <th>2. Code</th>
+          <th>Zeitstempel</th>
+        </tr>
+      </thead>
+      <tbody id="redemptionTable"></tbody>
+    </table>
+  </div>
+
+  <p id="emptyTable" class="description" style="margin-top:20px">
+    Bisher wurden noch keine Codes eingelöst.
+  </p>
+
+  <div class="admin-actions">
+    <button class="secondary" id="exportButton">
+      ↓ CSV exportieren
+    </button>
+    <button class="secondary" id="logoutButton">
+      Zurück zur Nutzeransicht
+    </button>
+  </div>
+</section>
+
+<footer>
+  Code-Einlöseportal · Lokale Speicherung
+</footer>
+
+</div>
+
+<script>
+"use strict";
+
+/* =========================================
+   KONFIGURATION
+   Hier kannst du deine Codes und dein
+   Admin-Passwort ändern.
+========================================= */
+
+const VALID_START_CODES = [
+  "7B4X9N2Z",
+  "ALPHA123",
+  "RÄTSEL2026",
+  "K8M4P2Q7",
+  "START999",
+  "GEHEIM001",
+  "PUZZLE42",
+  "CODE2026",
+  "X7K9L2M4",
+  "ABCD1234"
+];
+
+const ADMIN_PASSWORD = "geheimes_admin_passwort";
+
+const STORAGE_KEY = "raetselportal_v1";
+
+/* =========================================
+   SPEICHER
+========================================= */
+
+function loadData() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+
+    if (!raw) {
+      return { redemptions: [] };
+    }
+
+    const data = JSON.parse(raw);
+
+    if (!data || !Array.isArray(data.redemptions)) {
+      throw new Error("Ungültige Speicherdaten");
+    }
+
+    return data;
+  } catch (error) {
+    console.error("Speicherfehler:", error);
+    alert("Die gespeicherten Daten konnten nicht gelesen werden. Bitte Browser-Speicher prüfen.");
+    return { redemptions: [] };
+  }
+}
+
+function saveData(data) {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    return true;
+  } catch (error) {
+    console.error("Speicherfehler:", error);
+    alert("Die Daten konnten nicht gespeichert werden. Möglicherweise ist der Browser-Speicher voll oder nicht verfügbar.");
+    return false;
+  }
+}
+
+let database = loadData();
+
+/* =========================================
+   HILFSFUNKTIONEN
+========================================= */
+
+function normalizeCode(code) {
+  return code.trim().toUpperCase();
+}
+
+function createSecondCode() {
+  const characters = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+  let code;
+  const existing = new Set(
+    database.redemptions.map(item => item.secondCode)
+  );
+
+  do {
+    let randomPart = "";
+
+    if (window.crypto && window.crypto.getRandomValues) {
+      const bytes = new Uint8Array(10);
+      window.crypto.getRandomValues(bytes);
+
+      for (let i = 0; i < 10; i++) {
+        randomPart += characters[bytes[i] % characters.length];
+      }
+    } else {
+      for (let i = 0; i < 10; i++) {
+        randomPart += characters[
+          Math.floor(Math.random() * characters.length)
+        ];
+      }
+    }
+
+    code = "2ND-" + randomPart;
+
+  } while (existing.has(code));
+
+  return code;
+}
+
+function showMessage(element, text, type) {
+  element.textContent = text;
+  element.className = "message " + type;
+}
+
+function hideMessage(element) {
+  element.textContent = "";
+  element.className = "message";
+}
+
+function showView(view) {
+  document.getElementById("userView").classList.add("hidden");
+  document.getElementById("loginView").classList.add("hidden");
+  document.getElementById("adminView").classList.add("hidden");
+
+  document.getElementById(view).classList.remove("hidden");
+}
+
+/* =========================================
+   CODE EINLÖSEN
+========================================= */
+
+const redeemForm = document.getElementById("redeemForm");
+const message = document.getElementById("message");
+const result = document.getElementById("result");
+
+redeemForm.addEventListener("submit", function(event) {
+  event.preventDefault();
+
+  hideMessage(message);
+  result.style.display = "none";
+
+  const name = document.getElementById("userName").value.trim();
+  const startCode = normalizeCode(
+    document.getElementById("startCode").value
+  );
+
+  if (!name || !startCode) {
+    showMessage(message, "Bitte fülle beide Felder aus.", "error");
+    return;
+  }
+
+  if (!VALID_START_CODES.includes(startCode)) {
+    showMessage(
+      message,
+      "Dieser Start-Code ist ungültig. Bitte überprüfe deine Eingabe.",
+      "error"
+    );
+    return;
+  }
+
+  const alreadyUsed = database.redemptions.some(
+    item => item.startCode === startCode
+  );
+
+  if (alreadyUsed) {
+    showMessage(
+      message,
+      "Dieser Start-Code wurde bereits eingelöst und kann nicht erneut verwendet werden.",
+      "error"
+    );
+    return;
+  }
+
+  const secondCode = createSecondCode();
+
+  const redemption = {
+    id: database.redemptions.length
+      ? Math.max(...database.redemptions.map(item => item.id)) + 1
+      : 1,
+    name: name,
+    startCode: startCode,
+    secondCode: secondCode,
+    timestamp: new Date().toISOString()
+  };
+
+  database.redemptions.push(redemption);
+
+  if (!saveData(database)) {
+    database.redemptions.pop();
+    return;
+  }
+
+  document.getElementById("resultCode").textContent = secondCode;
+  result.style.display = "block";
+
+  showMessage(
+    message,
+    "Dein Start-Code wurde erfolgreich eingelöst!",
+    "success"
+  );
+
+  document.getElementById("startCode").value = "";
+});
+
+/* =========================================
+   CODE KOPIEREN
+========================================= */
+
+document.getElementById("copyButton").addEventListener("click", async function() {
+  const code = document.getElementById("resultCode").textContent;
+
+  try {
+    await navigator.clipboard.writeText(code);
+    this.textContent = "✓ Kopiert!";
+  } catch (error) {
+    const field = document.createElement("textarea");
+    field.value = code;
+    field.style.position = "fixed";
+    field.style.opacity = "0";
+    document.body.appendChild(field);
+    field.select();
+
+    try {
+      document.execCommand("copy");
+      this.textContent = "✓ Kopiert!";
+    } catch (copyError) {
+      this.textContent = "Bitte manuell kopieren";
+    }
+
+    field.remove();
+  }
+
+  setTimeout(() => {
+    this.textContent = "Code kopieren";
+  }, 2000);
+});
+
+/* =========================================
+   ADMIN LOGIN
+========================================= */
+
+document.getElementById("showAdmin").addEventListener("click", function() {
+  document.getElementById("adminPassword").value = "";
+  hideMessage(document.getElementById("loginMessage"));
+  showView("loginView");
+});
+
+document.getElementById("backFromLogin").addEventListener("click", function() {
+  showView("userView");
+});
+
+document.getElementById("loginForm").addEventListener("submit", function(event) {
+  event.preventDefault();
+
+  const password = document.getElementById("adminPassword").value;
+  const loginMessage = document.getElementById("loginMessage");
+
+  if (password !== ADMIN_PASSWORD) {
+    showMessage(loginMessage, "Das Passwort ist leider falsch.", "error");
+    return;
+  }
+
+  document.getElementById("adminPassword").value = "";
+
+  renderAdmin();
+  showView("adminView");
+});
+
+/* =========================================
+   ADMIN DASHBOARD
+========================================= */
+
+function renderAdmin() {
+  // Aktuelle Daten erneut laden
+  database = loadData();
+
+  const tbody = document.getElementById("redemptionTable");
+  tbody.innerHTML = "";
+
+  const redemptions = [...database.redemptions].reverse();
+
+  document.getElementById("totalRedemptions").textContent =
+    database.redemptions.length;
+
+  const usedCount = new Set(
+    database.redemptions.map(item => item.startCode)
+  ).size;
+
+  const remaining = VALID_START_CODES.filter(
+    code => !usedCount || !database.redemptions.some(
+      item => item.startCode === code
+    )
+  ).length;
+
+  document.getElementById("remainingCodes").textContent = remaining;
+
+  document.getElementById("emptyTable").style.display =
+    redemptions.length ? "none" : "block";
+
+  redemptions.forEach(item => {
+    const row = document.createElement("tr");
+
+    const values = [
+      item.id,
+      item.name,
+      item.startCode,
+      item.secondCode,
+      new Date(item.timestamp).toLocaleString("de-DE")
+    ];
+
+    values.forEach((value, index) => {
+      const cell = document.createElement("td");
+      cell.textContent = value;
+
+      if (index === 3) {
+        cell.className = "code-cell";
+      }
+
+      row.appendChild(cell);
+    });
+
+    tbody.appendChild(row);
+  });
+}
+
+/* =========================================
+   CSV EXPORT
+========================================= */
+
+document.getElementById("exportButton").addEventListener("click", function() {
+  database = loadData();
+
+  const headers = [
+    "ID",
+    "Name / Kürzel",
+    "Start-Code",
+    "2. Code",
+    "Zeitstempel"
+  ];
+
+  const rows = database.redemptions.map(item => [
+    item.id,
+    item.name,
+    item.startCode,
+    item.secondCode,
+    new Date(item.timestamp).toLocaleString("de-DE")
+  ]);
+
+  function escapeCSV(value) {
+    let text = String(value ?? "");
+
+    // Verhindert, dass Tabellenprogramme Zellinhalte
+    // als Formeln interpretieren.
+    if (/^[=+\-@\t\r]/.test(text)) {
+      text = "'" + text;
+    }
+
+    return '"' + text.replace(/"/g, '""') + '"';
+  }
+
+  const csv = [
+    headers.map(escapeCSV).join(";"),
+    ...rows.map(row => row.map(escapeCSV).join(";"))
+  ].join("\r\n");
+
+  const blob = new Blob(
+    ["\uFEFF" + csv],
+    { type: "text/csv;charset=utf-8;" }
+  );
+
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+
+  link.href = url;
+  link.download = "code-einloesungen.csv";
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+});
+
+/* =========================================
+   LOGOUT
+========================================= */
+
+document.getElementById("logoutButton").addEventListener("click", function() {
+  showView("userView");
+});
+
+// Initialisierung
+showView("userView");
+
+</script>
+</body>
+</html>
